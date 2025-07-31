@@ -1,133 +1,155 @@
-# CLPD — Context-Locked Prompt Disclosure
+# CLPD — Context‑Locked Prompt Disclosure  ![Static Badge](https://img.shields.io/badge/CLPD-V1.1-blue)
 
-**Version:** 1.0  
-**Maintainer:** ContextualWeaver  
-**License:** CC BY 4.0
+> **_TL;DR_** CLPD is a one‑line, copy‑pastable **“nutrition label” for AI prompts**.  
+> It tells readers _which hidden context_ (system role, memory, prior turns …) is required before a prompt will behave as advertised.
 
----
-
-**Problem:** Prompts now circulate faster than the hidden context they rely on.  
-Copy-paste them out of context and they break, confuse, or even mislead.
-
-> “This works, but only in the right context container.”
-
-**CLPD/1.0 requires:system,thread:3,mem:t**
+**Version:** 1.1  (2025‑07‑31)  
+**Maintainer:** *ContextualWeaver*  
+**License:** [Creative Commons BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 
 ---
 
-**CLPD** is a lightweight tagging convention for prompts that depend on hidden context:  
-system instructions, thread history, memory, or user profiles. It helps authors disclose what’s invisible — clearly and honestly.
+## Version history
+
+| Version | Date       | Highlights                                                                             |
+|---------|------------|----------------------------------------------------------------------------------------|
+| **1.1** | 2025‑07‑31 | TL;DR added, headings streamlined, syntax table, FAQ & risk notes, CC BY 4.0 clarified. |
+| **1.0** | 2025‑07‑28 | Initial public release.                                                                |
 
 ---
 
-## Who is CLPD for?
+## Problem
 
-- **Prompt engineers** who want to share without misleading  
-- **Developers** bundling context-aware prompts  
-- **Researchers** studying reproducibility and prompt artifacts  
-- **Educators** teaching transparent prompt design  
+Prompts now travel faster than the hidden context they rely on.  
+Copy‑paste them into a fresh chat and they break, confuse, or mislead.
 
 ---
 
-## Label Format
+## Solution
 
-CLPD/1.0 requires:[context types]
-
-Examples:
-- `CLPD/1.0 requires:system`
-- `CLPD/1.0 requires:system,thread:3,mem:t`
-
-These declare that the prompt depends on:
-- A specific **system message**
-- The last **3 turns** in a thread
-- Active **memory tokens**
-
----
-
-## What is CLPD?
-
-**Context-Locked Prompt Disclosure (CLPD)** is a public design pattern that supports ethical reuse of AI prompts that rely on prior state.
-
-Some prompts look standalone but aren’t. They depend on:
-- A system role
-- Conversation history
-- Memory state or user profile
-
-CLPD makes that dependency visible — in either natural language or machine-readable headers.
-
----
-
-## Misuse Scenarios
-
-CLPD should *not* be used to:
-- Fake prestige by labeling self-contained prompts as “locked”
-- Obscure dependencies behind a paywall
-- Hide malicious instructions under a false flag of context sensitivity
-
----
-
-## Recognizing CLPD in Everyday Prompts
-
-| Prompt Pattern         | Example Phrase                          | Hidden Dependency             | CLPD Relevance                    |
-|------------------------|------------------------------------------|-------------------------------|-----------------------------------|
-| **Implicit Role Cue**  | “As a senior strategist, advise me on…” | System prompt                 | Role assumed but not visible      |
-| **Functional Framing** | “Help me reflect on my last message…”   | Prior thread turns            | Requires unseen conversational arc|
-| **Memory Recall Ask**  | “Based on what I told you last week…”   | Long-term memory              | Prompt alone can’t reproduce it   |
-| **Tone-Carried Ask**   | “Let’s go back to brainstorming.”       | Session tone or prior behavior| Fragile without shared continuity |
-
----
-
-## Example: CLPD Prompt Card
+CLPD is a **minimal labelling convention** that travels with the prompt, signalling what’s missing:
 
 ```txt
-CLPD Prompt Card
-
-Title: Weekend Planning Assistant  
-Author (opt.): ContextualWeaver  
-CLPD Label: CLPD/1.0 requires:system,thread:1
-
-Summary:  
-This prompt helps generate tailored weekend plans based on the user’s past preferences and lifestyle hints.
-
-Dependencies:
-- System role: Friendly Concierge  
-- Prior chat turn: A message describing last weekend’s activities
-
-Failure Modes:
-- Without system role, tone may feel impersonal or overly generic  
-- Without prior chat turn, suggestions won’t reflect recent habits
-
-Ethical Notes:
-- CLPD label makes clear that personalization depends on context  
-- Prevents misleading reuse where “custom fit” might be assumed  
-- Reinforces that simple-looking prompts can hide deeper scaffolding
-
-Version Notes:
-- v1.0 — Designed for in-thread companion use
+CLPD/1.1 requires:system,thread:3,mem:t
 ```
 
----
-
-## Why this matters
-
-As LLM platforms evolve to support memory, session scope, and richer user profiles, the visible prompt becomes only one part of the behavioral equation.
-
-CLPD helps prompt authors surface those hidden dependencies — so others don’t misattribute outcomes to the prompt text alone.
-
-It’s a bridge toward honest prompt packaging and context-aware sharing.
+Put the label _above_ or _inside_ your prompt so anyone can see at a glance:  
+> “This recipe only works in _this_ kitchen.”
 
 ---
 
-## Get Involved
+## Label spec (v1.1)
 
-- [ ] CLPD Label Spec  
-- [ ] CLPD Template  
-- [ ] CLPD Primer  
-- [ ] Spread the word (Seed mentions)
+| Key      | Meaning                                   | Value Domain | Example        |
+|----------|-------------------------------------------|--------------|----------------|
+| `system` | Needs a specific system/role prompt       | flag         | `system`       |
+| `thread` | Requires N prior user-assistant turns     | integer      | `thread:3`     |
+| `mem`    | Relies on persistent memory               | `t` or `f`   | `mem:t`        |
+| `profile`| Depends on a saved user profile           | flag         | `profile`      |
+| `role`   | Agent must adopt a pre-set role           | free text    | `role:planner` |
 
-Join the conversation, remix responsibly, and help shape a more honest ecosystem of prompt sharing.
+### Grammar
+
+```txt
+CLPD/<version> requires:<key>[,<key>…]
+```
+
+Keys may appear in any order; omit what doesn’t apply.
 
 ---
 
-© ContextualWeaver, 2025. Released under CC BY 4.0.  
-Maintained and published by @ContextualWeaver in the spirit of open interoperability and prompt ethics.
+## Who is this for?
+
+| Persona            | Quick win                                                                 |
+|--------------------|---------------------------------------------------------------------------|
+| Prompt engineers   | Drop the label into blog posts & gists.                                   |
+| Product teams      | Validate CLPD strings in CI to catch missing scaffolding.                 |
+| Researchers        | Cite CLPD in methods for replication clarity (_BibTeX below_).            |
+| Educators          | Use CLPD as a 5-minute case study on context dependency.                  |
+
+---
+
+## How to adopt (30-second checklist)
+
+1. Paste `CLPD/<ver> requires:…` at the top of your prompt.  
+2. Declare only **hidden context** — not model versions or legal disclaimers.  
+3. Keep the label with the prompt wherever it’s shared.  
+4. _(Optional)_ Add the badge icon to READMEs, slides, or tweets.
+
+---
+
+## Example (teaser)
+
+```txt
+CLPD/1.1 requires:system,thread:2,mem:t
+```
+
+### Prompt
+
+> “As a trusted career coach, reflect on my last two messages and propose one action I should take this week…”
+
+The full working prompt and chain will live in [/examples/career-coach.md](examples/career-coach.md).
+
+---
+
+## FAQ
+
+<details>
+<summary>Does CLPD guarantee safety?</summary>
+No. CLPD only **declares dependency**. It does not enforce privacy, security, or policy compliance.
+</details>
+
+<details>
+<summary>Why not roll my own label?</summary>
+Fragmented micro-specs dilute clarity. A shared, vendor-neutral convention lowers friction for everyone.
+</details>
+
+<details>
+<summary>Is this a framework or library?</summary>
+No. CLPD is a **string convention**. There is no code to install.
+</details>
+
+---
+
+## Risks & guardrails
+
+| Risk                  | Mitigation                                           |
+|-----------------------|------------------------------------------------------|
+| False sense of security | Remind users “disclosure ≠ protection.”            |
+| Scope creep           | Limit keys to hidden-context prerequisites only.     |
+| Over-claiming         | Encourage precise, minimal labels.                   |
+
+---
+
+## Citation
+
+
+```bibtex
+@misc{clpd2025,
+  title        = {Context-Locked Prompt Disclosure (CLPD)},
+  author       = {ContextualWeaver},
+  year         = {2025},
+  month        = {July},
+  note         = {Version 1.1},
+  howpublished = {\url{https://github.com/ContextualWeaver/CLPD}},
+  keywords = {prompt context dependency, prompt reproducibility, CLPD, LLM transparency, labeling standards}
+}
+```
+---
+
+## License
+
+CLPD documentation and badge are released under **Creative Commons Attribution 4.0 International**.  
+You are free to share and adapt, **provided you maintain the intent of disclosing prompt context dependencies** and credit the original author.  
+
+© ContextualWeaver, 2025.
+<!--
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "name": "Context-Locked Prompt Disclosure (CLPD)",
+  "keywords": ["prompt context dependency","CLPD","LLM transparency","prompt reproducibility"]
+}
+</script>
+-->
